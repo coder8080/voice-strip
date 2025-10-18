@@ -12,6 +12,8 @@ PIXEL_RADIUS = 10
 TOTAL_PIXELS = 50
 CIRCLE_RADIUS = 200
 
+FLAGS = pygame.SCALED | pygame.RESIZABLE  # без OPENGL
+
 
 class Pixel:
     x: int
@@ -71,7 +73,7 @@ class Visual:
 
     def run(self):
         self.clock = pygame.time.Clock()
-        self.display = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.display = pygame.display.set_mode((WIDTH, HEIGHT), FLAGS)
         self.pixels = [Pixel(i) for i in range(TOTAL_PIXELS)]
 
         self.animation_type: AnimationType = AnimationType.RAINBOW
