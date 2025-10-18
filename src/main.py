@@ -1,9 +1,12 @@
-from visual import Visual
+from threading import Thread
 
-visual = Visual()
+from server import run_mcp
+from visual import visual
 
 
 def main():
+    t = Thread(target=run_mcp)
+    t.start()
     visual.run()
 
 

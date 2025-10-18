@@ -2,6 +2,7 @@ import sys
 from colorsys import hsv_to_rgb
 from enum import Enum
 from math import cos, pi, sin
+from queue import Queue
 
 import pygame
 
@@ -32,6 +33,11 @@ class AnimationType(Enum):
     RAINBOW = "rainbow"
 
 
+class Command:
+    type: AnimationType
+    colors: list[tuple[int, int, int]]
+
+
 class Visual:
     pygame.init()
 
@@ -44,6 +50,8 @@ class Visual:
     animation_colors: list[tuple[int, int, int]]
     animation_frames: int
 
+    q: Queue[Command]
+
     def animate_solid(self):
         for pixel in self.pixels:
             pixel.color = self.animation_colors[0]
@@ -55,6 +63,12 @@ class Visual:
             hue = i / TOTAL_PIXELS + move
             pixel.color = tuple(round(j * 255) for j in hsv_to_rgb(hue % 1, 1, 1))
 
+    def send_command(self, type: AnimationType, colors: list[tuple[int, int, int]]):
+        item = Command()
+        item.type = type
+        item.colors = colors
+        self.q.put(item)
+
     def run(self):
         self.clock = pygame.time.Clock()
         self.display = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -63,12 +77,18 @@ class Visual:
         self.animation_type: AnimationType = AnimationType.RAINBOW
         self.animation_colors: list[tuple[int, int, int]] = [[255, 0, 0]]
         self.animation_frames: int = 0
+        self.q = Queue()
 
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+
+            while self.q.not_empty:
+                cmd = self.q.get()
+                self.animation_type = cmd.type
+                self.animation_colors = cmd.colors
 
             self.display.fill((0, 0, 0))
 
@@ -83,3 +103,6 @@ class Visual:
             pygame.display.update()
             self.clock.tick(60)
             self.animation_frames += 1
+
+
+visual = Visual()
