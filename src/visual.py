@@ -85,7 +85,7 @@ class Visual:
                     pygame.quit()
                     sys.exit()
 
-            while self.q.not_empty:
+            while not self.q.empty():
                 cmd = self.q.get()
                 self.animation_type = cmd.type
                 self.animation_colors = cmd.colors
