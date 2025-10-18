@@ -5,7 +5,7 @@ from visual import visual
 
 
 def main():
-    t = Thread(target=run_mcp)
+    t = Thread(target=run_mcp, daemon=True, name="fast-mcp-server")
     t.start()
     visual.run()
 

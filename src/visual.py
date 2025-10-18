@@ -1,8 +1,9 @@
-import sys
 from colorsys import hsv_to_rgb
+from dataclasses import dataclass
 from enum import Enum
 from math import cos, floor, pi, sin
 from queue import Queue
+from typing import Optional
 
 import pygame
 from pydantic import TypeAdapter
@@ -39,24 +40,26 @@ class AnimationType(Enum):
     LOOP = "loop"
 
 
+@dataclass
 class Command:
     type: AnimationType
     colors: list[tuple[int, int, int]]
 
 
 class Visual:
-    pygame.init()
-
-    clock: pygame.time.Clock
-    display: pygame.Surface
-
-    pixels: list[Pixel] = [Pixel(i) for i in range(TOTAL_PIXELS)]
-
-    animation_type: AnimationType
-    animation_colors: list[tuple[int, int, int]]
-    animation_frames: int
-
-    q: Queue[Command]
+    def __init__(self):
+        pygame.init()
+        self.clock: pygame.time.Clock = pygame.time.Clock()
+        self.display: Optional[pygame.Surface] = None
+        self.pixels: list[Pixel] = [Pixel(i) for i in range(TOTAL_PIXELS)]
+        self.animation_type: AnimationType = AnimationType.LOOP
+        self.animation_colors: list[tuple[int, int, int]] = [
+            (255, 0, 0),
+            (0, 255, 0),
+            (0, 0, 255),
+        ]
+        self.animation_frames: int = 0
+        self.q: Queue[Command] = Queue()
 
     def animate_solid(self):
         for pixel in self.pixels:
@@ -99,16 +102,12 @@ class Visual:
             pixel.color = c
 
     def send_command(self, type: AnimationType, colors: list[tuple[int, int, int]]):
-        item = Command()
-        item.type = type
-        item.colors = colors
-        self.q.put(item)
+        self.q.put(Command(type=type, colors=colors))
 
     def run(self):
         self.clock = pygame.time.Clock()
         self.display = pygame.display.set_mode((WIDTH, HEIGHT))
         self.pixels = [Pixel(i) for i in range(TOTAL_PIXELS)]
-
         self.animation_type = AnimationType.LOOP
         self.animation_colors = [
             (255, 0, 0),
@@ -119,10 +118,15 @@ class Visual:
         self.q = Queue()
 
         while True:
+            stopped = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    sys.exit()
+                    stopped = True
+                    break
+
+            if stopped:
+                break
 
             while not self.q.empty():
                 cmd = self.q.get()
