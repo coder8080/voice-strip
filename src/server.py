@@ -44,7 +44,7 @@ def set_loop(colors: list[tuple[int, int, int]]):
     Установить последовательное переливание несколькими цветами
 
     Args:
-        colors: цвета, которыми лента должна переливаться
+        colors: массив цветов, которыми нужно переливаться (массив кортежей по 3 int)
     """
     visual.send_command(AnimationType.LOOP, colors)
     return "OK"
