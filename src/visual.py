@@ -108,11 +108,9 @@ class Visual:
         self.clock = pygame.time.Clock()
         self.display = pygame.display.set_mode((WIDTH, HEIGHT))
         self.pixels = [Pixel(i) for i in range(TOTAL_PIXELS)]
-        self.animation_type = AnimationType.LOOP
+        self.animation_type = AnimationType.SOLID
         self.animation_colors = [
-            (255, 0, 0),
-            (0, 255, 0),
-            (0, 0, 255),
+            (255, 255, 255),
         ]
         self.animation_frames = 0
         self.q = Queue()
